@@ -25,6 +25,7 @@
     OTHER DEALINGS IN THE SOFTWARE.
 
 """
+import gevent
 from provider.doozer_provider import DoozerProvider
 
 ##########################################################################
@@ -37,7 +38,7 @@ from provider.doozer_provider import DoozerProvider
 WATCH_PATH = "/watch"
 
 # The doozerd cluster address (at least, one node within the cluster)
-DOOZERD_ADDRESS = "127.0.0.1:8046"
+DOOZERD_ADDRESS = "doozerd:?ca=127.0.0.1:8046"
 
 ##########################################################################
 #
@@ -69,9 +70,15 @@ def main():
         callback_function=on_config_change
     )
 
-    #
-    # ... do important things here ...
-    #
+    RUN = True
+    print ">>> Simply press CTRL-C to quit."
+    while RUN:
+        try:
+            gevent.sleep(10)
+            print(">>> Going to sleep for 10 seconds ...")
+        except KeyboardInterrupt:
+            RUN = False
+            print(">>> Aborting run!")
 
     # Remove the watch from the Doozerd provider
     doozer_provider.deregister_callback(watch_path=WATCH_PATH)
