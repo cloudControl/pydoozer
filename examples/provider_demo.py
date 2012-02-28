@@ -26,7 +26,7 @@
 
 """
 import gevent
-from provider.doozer_provider import DoozerProvider
+from provider.doozer_provider import DoozerWatchProvider
 
 ##########################################################################
 #
@@ -60,12 +60,12 @@ def main():
         Demo method
     """
     # Connect to doozerd cluster
-    doozer_provider = DoozerProvider(doozerd_server=DOOZERD_ADDRESS)
+    doozer_watch_provider = DoozerWatchProvider(doozerd_server=DOOZERD_ADDRESS)
 
     # Register a watch; provide the callback function that should
     # be called when a new configuration object has been
     # received. This is non-blocking!
-    doozer_provider.register_callback(
+    doozer_watch_provider.register_callback(
         watch_path=WATCH_PATH,
         callback_function=on_config_change
     )
@@ -81,7 +81,7 @@ def main():
             print(">>> Aborting run!")
 
     # Remove the watch from the Doozerd provider
-    doozer_provider.deregister_callback(watch_path=WATCH_PATH)
+    doozer_watch_provider.deregister_callback(watch_path=WATCH_PATH)
 
 
 ##########################################################################
