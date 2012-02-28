@@ -6,8 +6,8 @@ import gevent.event
 import gevent.socket
 import google.protobuf.message
 
-from msg_pb2 import Response
-from msg_pb2 import Request
+from doozer.msg_pb2 import Response
+from doozer.msg_pb2 import Request
 
 CONNECT_TIMEOUT = 5.0
 REQUEST_TIMEOUT = 2.0
