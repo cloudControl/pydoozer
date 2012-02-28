@@ -26,7 +26,7 @@
 
 """
 import gevent
-from provider.doozer_provider import DoozerWatchProvider
+from provider.doozer_watch_provider import DoozerWatchProvider
 
 ##########################################################################
 #
