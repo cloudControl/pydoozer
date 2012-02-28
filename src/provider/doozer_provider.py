@@ -30,15 +30,15 @@ from gevent.timeout import Timeout
 from jobs.job_manager import JobManager
 
 
-class DoozerProvider(object):
+class DoozerWatchProvider(object):
     """
-        The DoozerProvider is basically a wrapper to a given Doozerd Cluster,
-        focusing on providing a method to create asynchronous watches for
-        objects that can be stored to Doozerd. An external library can register
-        callbacks for specified "watch paths". A "watch" is a Doozer wait on a
-        provided Doozerd tree path; as soon as a new object is written to this
-        path the DoozerProvider will recognize the change and start calling the
-        registered callback function.
+        The DoozerWatchProvider is basically a wrapper to a given Doozerd
+        Cluster, focusing on providing a method to create asynchronous watches
+        for objects that can be stored to Doozerd. An external library can
+        register callbacks for specified "watch paths". A "watch" is a Doozer
+        wait on a provided Doozerd tree path; as soon as a new object is
+        written to this path the DoozerProvider will recognize the change and
+        start calling the registered callback function.
 
         All jobs are managed via a Job Manager in a queue. Jobs can easily be
         added, referenced and removed.
@@ -67,6 +67,7 @@ class DoozerProvider(object):
         """
             Connect to a given doozer cluster
         """
+        #noinspection PyUnresolvedReferences
         self.client = doozer.connect(doozerd_server_address)
         self.revision = self.client.rev().rev
 
