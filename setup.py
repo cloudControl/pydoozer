@@ -24,7 +24,7 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.
 
-    setup script DoozerLib
+    setup script PyDoozer
 
     usage: sudo python setup.py install
 """
