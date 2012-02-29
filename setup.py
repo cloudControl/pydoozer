@@ -50,6 +50,6 @@ setup(
     scripts=[],
     data_files=[],
     download_url=DOWNLOAD_URL,
-    license='Apache 2.0',
+    license='MIT',
     **extra_options
 )
