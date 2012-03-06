@@ -53,7 +53,7 @@ class DoozerWatchProvider(object):
     # the job manager
     job_queue = JobManager()
 
-    # The doozerd address information, e.g. "10.224.65.94:8046"
+    # The doozerd address information, e.g. "doozerd:?ca=10.224.65.94:8046"
     doozerd_server = None
 
     def __init__(self, doozerd_server):
