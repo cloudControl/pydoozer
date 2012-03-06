@@ -46,3 +46,13 @@ class ClientTests(unittest.TestCase):
         # connect() should raise an exception IF YOU DON'T have a local doozer cluster running
         self.assertRaises(ValueError, connect, "1.2.3.4:8046")
         self.assertRaises(ConnectError, connect, "doozerd:?ca=1.2.3.4:8046")
+
+####################################################################
+#
+# MAIN
+#
+####################################################################
+
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(ClientTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)
