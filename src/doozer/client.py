@@ -11,13 +11,21 @@ import google.protobuf.message
 from doozer.msg_pb2 import Response
 from doozer.msg_pb2 import Request
 
+# Timeout (in seconds) for a connection attempt to a doozerd node
 CONNECT_TIMEOUT = 5.0
+
+# The maximum number of retries to connect
+MAX_RECONNECT_RETRIES = 3
+
+# Timeout (in seconds) for a send request
 REQUEST_TIMEOUT = 2.0
+
+# Use this URI if none has been provided (for development purpose)
 DEFAULT_URI = "doozerd:?%s" % "&".join([
     "ca=127.0.0.1:8046",
-    "ca=127.0.0.1:8041",
-    "ca=127.0.0.1:8042",
-    "ca=127.0.0.1:8043",
+    "ca=127.0.0.1:8047",
+    "ca=127.0.0.1:8048",
+    "ca=127.0.0.1:8049",
     ])
 
 _spawner = gevent.spawn
@@ -51,7 +59,9 @@ class NoEntity(ResponseError): pass
 
 #noinspection PyUnresolvedReferences
 def response_exception(response):
-    """Takes a response, returns proper exception if it has an error code"""
+    """
+        Takes a response, returns proper exception if it has an error code
+    """
     exceptions = {
         Response.TAG_IN_USE: TagInUse, Response.UNKNOWN_VERB: UnknownVerb,
         Response.READONLY: Readonly, Response.TOO_LATE: TooLate,
@@ -66,12 +76,16 @@ def response_exception(response):
 
 
 def pb_dict(message):
-    """Create dict representation of a protobuf message"""
+    """
+        Create dict representation of a protobuf message
+    """
     return dict([(field.name, value) for field, value in message.ListFields()])
 
 
 def parse_uri(uri):
-    """Parse the doozerd URI scheme to get node addresses"""
+    """
+        Parse the doozerd URI scheme to get node addresses
+    """
     if uri.startswith("doozerd:?"):
         before, params = uri.split("?", 1)
         addrs = []
@@ -84,13 +98,15 @@ def parse_uri(uri):
         raise ValueError("invalid doozerd uri")
 
 
-def connect(uri=None):
-    """Start a Doozer client connection"""
+def connect(uri=None, timeout=CONNECT_TIMEOUT, reconnect_retries=MAX_RECONNECT_RETRIES):
+    """
+        Start a Doozer client connection
+    """
     uri = uri or os.environ.get("DOOZER_URI", DEFAULT_URI)
     addrs = parse_uri(uri)
     if not addrs:
         raise ValueError("there were no addrs supplied in the uri (%s)" % uri)
-    return Client(addrs)
+    return Client(addrs, timeout, reconnect_retries)
 
 
 class Connection(object):
@@ -104,21 +120,21 @@ class Connection(object):
         self.address = None
         self.ready = gevent.event.Event()
 
-    def connect(self):
-        self.reconnect()
+    def connect(self, timeout=None, reconnect_retries=None):
+        self.reconnect(timeout, reconnect_retries)
 
-    def reconnect(self):
+    def reconnect(self, timeout=None, reconnect_retries=None):
         self.disconnect()
-        # TODO: provide parameter for range maximum
-        # TODO: add timeout parameter for connect()
-        for retry in range(5):
+        for retry in range(reconnect_retries):
             addrs = list(self.addrs)
             while len(addrs):
                 try:
                     host, port = addrs.pop(0).split(':')
                     self.address = "%s:%s" % (host, port)
-                    # TODO: Check gevent.socket.create_connection for timeout
-                    self.sock = gevent.socket.create_connection((host, int(port)))
+                    self.sock = gevent.socket.create_connection(
+                        address=(host, int(port)),
+                        timeout=timeout
+                    )
                     self.ready.set()
                     self.loop = _spawner(self._recv_loop)
                     return
@@ -182,11 +198,11 @@ class Connection(object):
 
 #noinspection PyUnresolvedReferences
 class Client(object):
-    def __init__(self, addrs=None):
+    def __init__(self, addrs=None, timeout=None, reconnect_retries=None):
         if addrs is None:
             addrs = []
         self.connection = Connection(addrs)
-        self.connect()
+        self.connect(timeout, reconnect_retries)
 
     def rev(self):
         request = Request(verb=Request.REV)
@@ -257,5 +273,5 @@ class Client(object):
     def disconnect(self):
         self.connection.disconnect()
 
-    def connect(self):
-        self.connection.connect()
+    def connect(self, timeout, reconnect_retries):
+        self.connection.connect(timeout, reconnect_retries)
