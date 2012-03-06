@@ -32,6 +32,16 @@ Using the `pip install git+ssh://...` method doesn't seem to run into this issue
 
 For more information check following issue: [Protobuf Issue #66](http://code.google.com/p/protobuf/issues/detail?id=66)
 
+## Requirements
+
+`PyDoozer` needs:
+
+- [Protobuf](http://code.google.com/p/protobuf)
+- [gevent](http://www.gevent.org/)
+- [greentlet](http://readthedocs.org/docs/greenlet/en/latest/)
+
+You will need to install these for development. Upon installation, the dependencies are automatically installed.
+
 ## Todo
 
  * Entity class to wrap Response objects about entities

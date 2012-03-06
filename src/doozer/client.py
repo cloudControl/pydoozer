@@ -4,6 +4,8 @@ import struct
 import gevent
 import gevent.event
 import gevent.socket
+
+#noinspection PyUnresolvedReferences
 import google.protobuf.message
 
 from doozer.msg_pb2 import Response
@@ -20,16 +22,19 @@ DEFAULT_URI = "doozerd:?%s" % "&".join([
 
 _spawner = gevent.spawn
 
+
 class ConnectError(Exception): pass
 class ResponseError(Exception):
+    #noinspection PyMissingConstructor
     def __init__(self, response, request):
         self.code = response.err_code
         self.detail = response.err_detail
         self.response = response
         self.request = request
-    
+
     def __str__(self):
         return str(pb_dict(self.request))
+
 
 class TagInUse(ResponseError): pass
 class UnknownVerb(ResponseError): pass
@@ -43,11 +48,13 @@ class NotDirectory(ResponseError): pass
 class IsDirectory(ResponseError): pass
 class NoEntity(ResponseError): pass
 
+
+#noinspection PyUnresolvedReferences
 def response_exception(response):
     """Takes a response, returns proper exception if it has an error code"""
     exceptions = {
         Response.TAG_IN_USE: TagInUse, Response.UNKNOWN_VERB: UnknownVerb,
-        Response.READONLY: Readonly, Response.TOO_LATE: TooLate, 
+        Response.READONLY: Readonly, Response.TOO_LATE: TooLate,
         Response.REV_MISMATCH: RevMismatch, Response.BAD_PATH: BadPath,
         Response.MISSING_ARG: MissingArg, Response.RANGE: Range,
         Response.NOTDIR: NotDirectory, Response.ISDIR: IsDirectory,
@@ -57,9 +64,11 @@ def response_exception(response):
     else:
         return None
 
+
 def pb_dict(message):
     """Create dict representation of a protobuf message"""
     return dict([(field.name, value) for field, value in message.ListFields()])
+
 
 def parse_uri(uri):
     """Parse the doozerd URI scheme to get node addresses"""
@@ -74,6 +83,7 @@ def parse_uri(uri):
     else:
         raise ValueError("invalid doozerd uri")
 
+
 def connect(uri=None):
     """Start a Doozer client connection"""
     uri = uri or os.environ.get("DOOZER_URI", DEFAULT_URI)
@@ -81,6 +91,7 @@ def connect(uri=None):
     if not addrs:
         raise ValueError("there were no addrs supplied in the uri (%s)" % uri)
     return Client(addrs)
+
 
 class Connection(object):
     def __init__(self, addrs=None):
@@ -92,18 +103,21 @@ class Connection(object):
         self.sock = None
         self.address = None
         self.ready = gevent.event.Event()
-    
+
     def connect(self):
         self.reconnect()
-    
+
     def reconnect(self):
         self.disconnect()
+        # TODO: provide parameter for range maximum
+        # TODO: add timeout parameter for connect()
         for retry in range(5):
             addrs = list(self.addrs)
             while len(addrs):
                 try:
                     host, port = addrs.pop(0).split(':')
                     self.address = "%s:%s" % (host, port)
+                    # TODO: Check gevent.socket.create_connection for timeout
                     self.sock = gevent.socket.create_connection((host, int(port)))
                     self.ready.set()
                     self.loop = _spawner(self._recv_loop)
@@ -112,19 +126,19 @@ class Connection(object):
                     pass
             gevent.sleep(retry * 2)
         raise ConnectError("Can't connect to any of the addresses: %s" % self.addrs)
-    
+
     def disconnect(self):
         if self.loop:
             self.loop.kill()
         if self.sock:
             self.sock.close()
         self.ready.clear()
-    
+
     def send(self, request, retry=True):
         request.tag = 0
         while request.tag in self.pending:
             request.tag += 1
-            request.tag %= 2**31
+            request.tag %= 2 ** 31
         self.pending[request.tag] = gevent.event.AsyncResult()
         data = request.SerializeToString()
         head = struct.pack(">I", len(data))
@@ -145,7 +159,8 @@ class Connection(object):
         if exception:
             raise exception(response, request)
         return response
-    
+
+    #noinspection PyUnresolvedReferences
     def _recv_loop(self):
         while True:
             try:
@@ -156,67 +171,69 @@ class Connection(object):
                 response.ParseFromString(data)
                 if response.tag in self.pending:
                     self.pending[response.tag].set(response)
-            except struct.error, e:
-                # If some extra bytes are sent, just reconnect. 
-                # This is related to this bug: 
+            except struct.error:
+                # If some extra bytes are sent, just reconnect.
+                # This is related to this bug:
                 # https://github.com/ha/doozerd/issues/5
                 self.reconnect()
-            except IOError, e:
+            except IOError:
                 self.reconnect()
-                
 
+
+#noinspection PyUnresolvedReferences
 class Client(object):
     def __init__(self, addrs=None):
         if addrs is None:
             addrs = []
         self.connection = Connection(addrs)
         self.connect()
-    
+
     def rev(self):
         request = Request(verb=Request.REV)
         return self.connection.send(request)
-        
+
     def set(self, path, value, rev):
         request = Request(path=path, value=value, rev=rev, verb=Request.SET)
         return self.connection.send(request, retry=False)
-        
+
     def get(self, path, rev=None):
         request = Request(path=path, verb=Request.GET)
         if rev:
             request.rev = rev
         return self.connection.send(request)
-    
+
     def delete(self, path, rev):
         request = Request(path=path, rev=rev, verb=Request.DEL)
         return self.connection.send(request, retry=False)
-    
+
     def wait(self, path, rev):
         request = Request(path=path, rev=rev, verb=Request.WAIT)
         return self.connection.send(request)
-    
+
     def stat(self, path, rev):
         request = Request(path=path, rev=rev, verb=Request.STAT)
         return self.connection.send(request)
-    
+
     def access(self, secret):
         request = Request(value=secret, verb=Request.ACCESS)
         return self.connection.send(request)
-    
+
     def _getdir(self, path, offset=0, rev=None):
         request = Request(path=path, offset=offset, verb=Request.GETDIR)
         if rev:
             request.rev = rev
         return self.connection.send(request)
-        
+
     def _walk(self, path, offset=0, rev=None):
         request = Request(path=path, offset=offset, verb=Request.WALK)
         if rev:
             request.rev = rev
         return self.connection.send(request)
-    
+
+    #noinspection PyUnusedLocal
     def watch(self, path, rev):
         raise NotImplementedError()
-    
+
     def _list(self, method, path, offset=None, rev=None):
         offset = offset or 0
         entities = []
@@ -230,15 +247,15 @@ class Client(object):
                 return entities
             else:
                 raise e
-            
+
     def walk(self, path, offset=None, rev=None):
         return self._list('_walk', path, offset, rev)
-    
+
     def getdir(self, path, offset=None, rev=None):
         return self._list('_getdir', path, offset, rev)
-    
+
     def disconnect(self):
         self.connection.disconnect()
-    
+
     def connect(self):
         self.connection.connect()

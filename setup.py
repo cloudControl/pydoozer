@@ -33,14 +33,16 @@ from distutils.core import setup
 from setuptools import find_packages
 import version
 
-DOWNLOAD_URL = 'https://github.com/downloads/cloudControl/pydoozer/pydoozer-{0}.tar.gz'.format(version.__version__)
+DOWNLOAD_URL = 'https://github.com/downloads/cloudControl/pydoozer/' \
+               'pydoozer-{0}.tar.gz'.format(version.__version__)
 
 extra_options = dict()
 
 setup(
     name="PyDoozer",
     version=version.__version__,
-    description='PyDoozer - Doozer client library for Python. Based on github.com/progrium/pydoozer.',
+    description='PyDoozer - Doozer client library for Python. Based on ' \
+                'github.com/progrium/pydoozer.',
     author='cloudControl Team',
     author_email='info@cloudcontrol.de',
     url='https://github.com/cloudControl/pydoozer',
