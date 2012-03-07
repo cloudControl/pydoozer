@@ -1,6 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+
     Copyright (c) 2012 cloudControl GmbH
 
     Permission is hereby granted, free of charge, to any person
@@ -24,32 +24,4 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.
 
-    setup script PyDoozer
-
-    usage: sudo python setup.py install
 """
-
-from distutils.core import setup
-import version
-
-DOWNLOAD_URL = 'https://github.com/downloads/cloudControl/pydoozer/' \
-               'pydoozer-{0}.tar.gz'.format(version.__version__)
-
-extra_options = dict()
-
-setup(
-    name="PyDoozer",
-    version=version.__version__,
-    description='PyDoozer - Doozer client library for Python. Based on ' \
-                'github.com/progrium/pydoozer.',
-    author='cloudControl Team',
-    author_email='info@cloudcontrol.de',
-    url='https://github.com/cloudControl/pydoozer',
-    install_requires=['gevent', 'protobuf'],
-    packages=['pydoozer'],
-    scripts=[],
-    data_files=[],
-    download_url=DOWNLOAD_URL,
-    license='MIT',
-    **extra_options
-)
