@@ -36,8 +36,6 @@ import version
 DOWNLOAD_URL = 'https://github.com/downloads/cloudControl/pydoozer/' \
                'pydoozer-{0}.tar.gz'.format(version.__version__)
 
-extra_options = dict()
-
 setup(
     name="PyDoozer",
     version=version.__version__,
@@ -47,11 +45,7 @@ setup(
     author_email='info@cloudcontrol.de',
     url='https://github.com/cloudControl/pydoozer',
     install_requires=['gevent', 'protobuf'],
-    packages=find_packages('pydoozer'),
-    package_dir={'', 'pydoozer'},
-    scripts=[],
-    data_files=[],
+    packages=find_packages(),
     download_url=DOWNLOAD_URL,
-    license='MIT',
-    **extra_options
+    license='MIT'
 )
