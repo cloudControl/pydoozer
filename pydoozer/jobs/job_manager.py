@@ -24,7 +24,7 @@
     OTHER DEALINGS IN THE SOFTWARE.
 
 """
-from jobs.job import Job
+from pydoozer.jobs import Job
 
 
 class JobManager(object):

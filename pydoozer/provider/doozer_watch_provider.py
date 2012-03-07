@@ -24,10 +24,10 @@
     OTHER DEALINGS IN THE SOFTWARE.
 
 """
-import doozer
+import pydoozer.doozer as doozer
 import gevent
 from gevent.timeout import Timeout
-from jobs.job_manager import JobManager
+from pydoozer.jobs.job_manager import JobManager
 
 
 class DoozerWatchProvider(object):
