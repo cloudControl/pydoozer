@@ -8,8 +8,8 @@ import gevent.socket
 #noinspection PyUnresolvedReferences
 import google.protobuf.message
 
-from doozer.msg_pb2 import Response
-from doozer.msg_pb2 import Request
+from pydoozer.doozer.msg_pb2 import Response
+from pydoozer.doozer.msg_pb2 import Request
 
 # Timeout (in seconds) for a connection attempt to a doozerd node
 CONNECT_TIMEOUT = 5.0
