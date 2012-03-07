@@ -30,6 +30,7 @@
 """
 
 from distutils.core import setup
+from setuptools import find_packages
 import version
 
 DOWNLOAD_URL = 'https://github.com/downloads/cloudControl/pydoozer/' \
@@ -46,7 +47,7 @@ setup(
     author_email='info@cloudcontrol.de',
     url='https://github.com/cloudControl/pydoozer',
     install_requires=['gevent', 'protobuf'],
-    packages=['pydoozer'],
+    packages=find_packages('pydoozer'),
     scripts=[],
     data_files=[],
     download_url=DOWNLOAD_URL,
