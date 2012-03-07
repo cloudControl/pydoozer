@@ -48,6 +48,7 @@ setup(
     url='https://github.com/cloudControl/pydoozer',
     install_requires=['gevent', 'protobuf'],
     packages=find_packages('pydoozer'),
+    packages_dir={'', 'pydoozer'},
     scripts=[],
     data_files=[],
     download_url=DOWNLOAD_URL,
