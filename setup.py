@@ -44,7 +44,7 @@ setup(
     author='cloudControl Team',
     author_email='info@cloudcontrol.de',
     url='https://github.com/cloudControl/pydoozer',
-    install_requires=['gevent', 'protobuf'],
+    install_requires=['gevent', 'protobuf', 'greenlet'],
     packages=find_packages(),
     download_url=DOWNLOAD_URL,
     license='MIT'

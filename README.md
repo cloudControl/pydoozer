@@ -3,15 +3,15 @@
 A Python client for [Doozer](https://github.com/ha/doozerd) using gevent. This is based on Jeff Lindsay's and
 Neuman Vong's [progrium/pydoozer](https://github.com/progrium/pydoozer).
 
-## Status
+## Latest version
 
-Still quite early.
+The latest is `0.1.1`.
 
 ## Installation
 
 Install via `pip`:
 
-	$ pip install git+ssh://git@github.com/cloudControl/pydoozer
+	$ pip install git+ssh://git@github.com/cloudControl/pydoozer.git@0.1.1
 
 ### Installation error with protobuf 2.4.1 on `python setup.py install`
 
