@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(__file__) + "/..")
 
-import doozer
+from pydoozer import doozer
 
 client = doozer.connect()
 
@@ -13,7 +13,7 @@ foo = client.get("/foo")
 print "Got /foo with %s" % foo.value
 
 root = client.getdir("/")
-print "Directly under / is %s" % ', '.join([file.path for file in root])
+print "Directly under / is %s" % ', '.join([f.path for f in root])
 
 client.delete("/foo", rev)
 print "Deleted /foo"
@@ -22,7 +22,7 @@ foo = client.get("/foo")
 print repr(foo)
 
 walk = client.walk("/**")
-for file in walk:
-    print ' '.join([file.path, str(file.rev), file.value])
+for f in walk:
+    print ' '.join([f.path, str(f.rev), f.value])
 
 client.disconnect()

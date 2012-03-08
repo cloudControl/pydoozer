@@ -19,17 +19,21 @@
 
 """
 import unittest
-from doozer.client import parse_uri, connect, ConnectError
+from mock import Mock
+from mock import patch
+
+
+from pydoozer.doozer.client import connect
+from pydoozer.doozer.client import parse_uri
+from pydoozer.doozer.client import ConnectError
+from pydoozer.doozer.client import CONNECT_TIMEOUT
+from pydoozer.doozer.client import MAX_RECONNECT_RETRIES
 
 
 class ClientTests(unittest.TestCase):
+
     def setUp(self):
         super(ClientTests, self).setUp()
-
-
-    def tearDown(self):
-        super(ClientTests, self).tearDown()
-
 
     def test_parse_uri(self):
         # These URIs should all raise exceptions!
@@ -41,11 +45,24 @@ class ClientTests(unittest.TestCase):
         # This URI should work!
         self.assertEqual(['1.2.3.4:8046'], parse_uri(uri="doozerd:?ca=1.2.3.4:8046"))
 
-
-    def test_connect(self):
+    def test_connect_error(self):
         # connect() should raise an exception IF YOU DON'T have a local doozer cluster running
-        self.assertRaises(ValueError, connect, "1.2.3.4:8046")
-        self.assertRaises(ConnectError, connect, "doozerd:?ca=1.2.3.4:8046")
+        self.assertRaises(ValueError, connect, "1.2.3.4:8046", timeout=0.1, reconnect_retries=1)
+        self.assertRaises(ConnectError, connect, "doozerd:?ca=1.2.3.4:8046", timeout=0.1, reconnect_retries=1)
+
+    @patch('pydoozer.doozer.client.Connection')
+    def test_connect_success(self, class_connection):
+        # connect() should return a client object
+        connection = Mock()
+        class_connection.return_value = connection
+        client = connect("doozerd:?ca=127.0.0.2:8046")
+        
+        self.assertEqual(['127.0.0.2:8046'], class_connection.call_args[0][0])
+        self.assertEqual(CONNECT_TIMEOUT, connection.connect.call_args[0][0])
+        self.assertEqual(MAX_RECONNECT_RETRIES, connection.connect.call_args[0][1])
+        self.assertEqual(connection, client.connection)
+
+
 
 ####################################################################
 #

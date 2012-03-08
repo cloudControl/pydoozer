@@ -19,8 +19,8 @@
 
 """
 import unittest
-from jobs.job import Job
-from jobs.job_manager import JobManager
+from pydoozer.jobs.Job import Job
+from pydoozer.jobs.job_manager import JobManager
 
 
 class JobManagerTests(unittest.TestCase):

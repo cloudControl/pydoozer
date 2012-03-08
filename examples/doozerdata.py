@@ -1,11 +1,14 @@
 """
 created by stephan preeker. 2011-10
 """
-import doozer
 import gevent
-
-from doozer.client import RevMismatch, TooLate, NoEntity, BadPath
 from gevent import Timeout
+
+from pydoozer import doozer
+from pydoozer.doozer.client import RevMismatch
+from pydoozer.doozer.client import TooLate
+from pydoozer.doozer.client import NoEntity
+from pydoozer.doozer.client import BadPath
 
 
 class DoozerData():
@@ -179,7 +182,7 @@ class DoozerData():
     def delete_all(self):
         """ clear all data.
         """
-        for path, rev, value in self.items():
+        for path, rev, value in self.items(): # @UnusedVariable
             try:
                 item = self.client.delete(self.folder(path), rev)
             except RevMismatch:

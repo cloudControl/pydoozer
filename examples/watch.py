@@ -1,12 +1,12 @@
 import os
 import sys
-
 sys.path.append(os.path.dirname(__file__) + "/..")
 
 import gevent
-import doozer
-
 from gevent import Timeout
+
+from pydoozer import doozer
+
 
 client = doozer.connect()
 rev = client.rev().rev
